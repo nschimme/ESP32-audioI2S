@@ -1,29 +1,18 @@
 /*
  *  aac_decoder.h
- *  faad2 - ESP32 adaptation
- *  Created on: 12.09.2023
- *  Updated on: 13.06.2026
+ *  libfaad3 (faad3/) wrapper
  */
 
 #pragma once
 
-#ifdef AAC_USE_FAAD3
-#include "aac_decoder_faad3.h"
-#else
-
 #include "../Audio.h"
-#include "libfaad/aac_settings.h"
-#include "libfaad/aac_structs.h"
-#include "libfaad/aac_defines.h"
-#include "libfaad/aac_tables.h"
-#include "libfaad/neaacdec.h"
-
-#pragma GCC diagnostic warning "-Wunused-function"
+#include "faad3/faad.h"
 
 class AACDecoder : public Decoder {
 
   public:
     enum : int8_t {
+        AAC_NEED_MORE_DATA = 101,
         AAC_ID3_HDR = 100,
         AAC_NONE = 0,
         AAC_ERR = -1,
@@ -50,38 +39,25 @@ class AACDecoder : public Decoder {
     std::vector<uint32_t> getMetadataBlockPicture() override;
     const char*           arg1() override;
     const char*           arg2() override;
-    virtual int32_t       val1() override; // Paramertric Stereo
+    virtual int32_t       val1() override; // Parametric Stereo
     virtual int32_t       val2() override; // SBR
 
   private:
-    Audio&       audio;
-    ps_ptr<char> m_arg1;
-    void         createAudioSpecificConfig(uint8_t* config, uint8_t audioObjectType, uint8_t samplingFrequencyIndex, uint8_t channelConfiguration);
-    error_info_t getErrorMessage(int8_t err);
+    bool openDecoder(const uint8_t* asc, uint32_t ascLen);
+    void closeDecoder();
 
-    NeAACDecHandle                m_hAac;
-    NeAACDecFrameInfo             m_frameInfo;
-    NeAACDecConfigurationPtr      m_conf;
-    const uint8_t                 SYNCWORDH = 0xff; /* 12-bit syncword */
-    const uint8_t                 SYNCWORDL = 0xf0;
-    bool                          m_f_decoderIsInit = false;
-    bool                          m_f_firstCall = false;
-    bool                          m_f_setRaWBlockParams = false;
-    uint32_t                      m_aacSamplerate = 0;
-    uint8_t                       m_aacChannels = 0;
-    uint8_t                       m_aacProfile = 0;
-    uint16_t                      m_validSamples = 0;
-    float                         m_compressionRatio = 1;
-    std::unique_ptr<NeaacDecoder> m_neaacdec;
-
-    struct AudioSpecificConfig {
-        uint8_t audioObjectType;
-        uint8_t samplingFrequencyIndex;
-        uint8_t channelConfiguration;
-    };
-
-// ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
+    Audio&           audio;
+    faad_decoder*    m_dec = nullptr;
+    void*            m_mem = nullptr; // the decoder's state, one block
+    faad_frame_info  m_frameInfo = {};
+    bool             m_f_decoderIsInit = false;
+    bool             m_f_firstCall = false;
+    bool             m_f_setRaWBlockParams = false;
+    bool             m_f_adts = true;
+    bool             m_f_framed = false; // a frame has been decoded since the decoder was opened
+    uint32_t         m_aacSamplerate = 0;
+    uint8_t          m_aacChannels = 0;
+    uint8_t          m_aacProfile = 0;
+    uint16_t         m_validSamples = 0;
+    float            m_compressionRatio = 1;
 };
-
-#endif // AAC_USE_FAAD3
