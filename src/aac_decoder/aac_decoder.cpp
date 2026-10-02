@@ -6,6 +6,7 @@
  */
 
 #include "aac_decoder.h"
+#ifndef AAC_USE_FAAD3
 #include "Arduino.h"
 #include "libfaad/neaacdec.h"
 #include <stdbool.h>
@@ -227,3 +228,4 @@ void AACDecoder::createAudioSpecificConfig(uint8_t* config, uint8_t audioObjectT
 // —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 // extern uint8_t NeaacDecoder::get_sr_index(const uint32_t samplerate);
 // —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+#endif // AAC_USE_FAAD3

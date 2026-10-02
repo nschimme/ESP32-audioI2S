@@ -27,6 +27,7 @@
 **
 ** $Id: bits.c,v 1.44 2007/11/01 12:33:29 menno Exp $
 **/
+#ifndef AAC_USE_FAAD3
 #include "neaacdec.h"
 #include "Arduino.h"
 #include <stdint-gcc.h>
@@ -15695,3 +15696,4 @@ void NeaacDecoder::gc_set_protopqf(real_t* p_proto) {
 }
 #endif
 // ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+#endif // AAC_USE_FAAD3

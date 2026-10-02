@@ -7,6 +7,10 @@
 
 #pragma once
 
+#ifdef AAC_USE_FAAD3
+#include "aac_decoder_faad3.h"
+#else
+
 #include "../Audio.h"
 #include "libfaad/aac_settings.h"
 #include "libfaad/aac_structs.h"
@@ -79,3 +83,5 @@ class AACDecoder : public Decoder {
 // ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 };
+
+#endif // AAC_USE_FAAD3
